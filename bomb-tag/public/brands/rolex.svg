@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 140">
+  <path d="M60 12l10 18 20 2-16 14 6 20-20-12-20 12 6-20-16-14 20-2z" fill="#A37E2C"/>
+  <circle cx="60" cy="92" r="36" fill="none" stroke="#A37E2C" stroke-width="8"/>
+  <text x="60" y="98" text-anchor="middle" font-family="Georgia,serif" font-size="14" fill="#A37E2C">ROLEX</text>
+</svg>

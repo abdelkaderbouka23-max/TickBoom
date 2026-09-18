@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Bomb Tag</title>
+  <meta name="theme-color" content="#4A2DFF" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body data-phase="home" data-danger="calm">
+  <div id="aurora" aria-hidden="true"></div>
+
+  <button id="muteBtn" class="icon-btn" type="button" aria-label="Mute">
+    <svg id="muteIcon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 10v4h4l5 4V6L8 10H4z"/><path d="M16 9c1.2 1 1.8 2.4 1.8 3s-.6 2-1.8 3"/></svg>
+  </button>
+
+  <main id="app">
+    <section id="screen-home" class="screen active" data-screen="home">
+      <div class="home-mark" aria-hidden="true">
+        <svg class="mark-bomb" viewBox="0 0 160 180">
+          <defs>
+            <radialGradient id="hm" cx="32%" cy="28%"><stop offset="0%" stop-color="#5a6278"/><stop offset="55%" stop-color="#1c1f2b"/><stop offset="100%" stop-color="#0b0c12"/></radialGradient>
+          </defs>
+          <ellipse cx="80" cy="168" rx="40" ry="7" fill="rgba(8,6,24,.28)"/>
+          <path d="M92 34 C108 12 128 22 124 8" fill="none" stroke="#c9a46a" stroke-width="5" stroke-linecap="round"/>
+          <circle cx="126" cy="8" r="5" fill="#ffb020"/>
+          <rect x="66" y="32" width="28" height="14" rx="3" fill="#d7b56a"/>
+          <circle cx="80" cy="98" r="52" fill="url(#hm)"/>
+          <ellipse cx="62" cy="80" rx="16" ry="10" fill="rgba(255,255,255,.14)"/>
+        </svg>
+      </div>
+      <p class="kicker">Realtime party game</p>
+      <h1 class="logo">BOMB TAG</h1>
+      <p class="tagline">Pass the bomb. Survive the round.<br />Last player standing wins.</p>
+      <form id="homeForm" class="stack">
+        <label class="field">
+          <span>Display name</span>
+          <input id="playerName" name="playerName" maxlength="14" placeholder="Alex" autocomplete="nickname" required />
+        </label>
+        <button type="submit" class="btn btn-accent" id="createBtn">Create room</button>
+      </form>
+      <div class="join-panel">
+        <p>Have a code?</p>
+        <div class="join-row">
+          <input id="joinCode" maxlength="4" placeholder="7K4P" spellcheck="false" autocomplete="off" />
+          <button type="button" class="btn btn-light" id="joinBtn">Join</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-lobby" class="screen" data-screen="lobby" hidden>
+      <p class="kicker">Room code</p>
+      <h2 class="room-code" id="roomCode">----</h2>
+      <div class="lobby-actions">
+        <button type="button" class="btn btn-light" id="copyCodeBtn">Copy code</button>
+        <button type="button" class="btn btn-ghost" id="leaveLobbyBtn">Leave</button>
+      </div>
+      <p class="section-label">Players in the room</p>
+      <div id="playerGrid" class="player-row"></div>
+      <p class="ready-line" id="readyLine">1 player ready</p>
+      <p class="host-note" id="hostNote"></p>
+      <button type="button" class="btn btn-accent btn-xl" id="startBtn">Start game</button>
+      <button type="button" class="btn btn-ghost" id="closeRoomBtn">Close room</button>
+    </section>
+
+    <section id="screen-vote" class="screen" data-screen="vote" hidden>
+      <header class="vote-head">
+        <p class="kicker" id="voteKicker">Choose your challenge</p>
+        <div class="vote-timer">
+          <span id="voteClock">9.0</span>
+          <div class="vote-bar"><i id="voteBar"></i></div>
+        </div>
+      </header>
+      <div id="themeGrid" class="theme-grid"></div>
+      <p class="vote-foot" id="voteFoot">Pick one theme. Votes lock automatically.</p>
+    </section>
+
+    <section id="screen-game" class="screen game-screen" data-screen="game" hidden>
+      <header class="game-top">
+        <div class="chip" id="whoChip">Standby</div>
+        <div class="timer-block">
+          <div class="timer-num" id="timer">20.0</div>
+          <svg class="timer-ring" viewBox="0 0 120 12" preserveAspectRatio="none" aria-hidden="true">
+            <rect x="0" y="4" width="120" height="4" rx="2" fill="rgba(255,255,255,.18)"/>
+            <rect id="timerFill" x="0" y="4" width="120" height="4" rx="2" fill="#fff"/>
+          </svg>
+        </div>
+        <div class="chip chip-right" id="aliveChip">0 alive</div>
+      </header>
+
+      <div class="bomb-stage" id="bombStage">
+        <div class="particles" id="particles" aria-hidden="true"></div>
+        <div class="bomb" id="bomb" aria-hidden="true">
+          <svg viewBox="0 0 280 300" class="bomb-svg">
+            <defs>
+              <radialGradient id="steel" cx="34%" cy="28%">
+                <stop offset="0%" stop-color="#8b93a7"/>
+                <stop offset="38%" stop-color="#3a4154"/>
+                <stop offset="72%" stop-color="#151821"/>
+                <stop offset="100%" stop-color="#07080c"/>
+              </radialGradient>
+              <linearGradient id="cap" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stop-color="#f0d48a"/><stop offset="100%" stop-color="#9a7430"/>
+              </linearGradient>
+              <filter id="glow"><feGaussianBlur stdDeviation="2.2"/></filter>
+            </defs>
+            <ellipse cx="140" cy="286" rx="72" ry="10" fill="rgba(6,4,20,.35)"/>
+            <path class="fuse-path" d="M158 58 C186 28 214 40 208 18" fill="none" stroke="#c4a36a" stroke-width="7" stroke-linecap="round"/>
+            <circle class="spark" cx="210" cy="16" r="7" fill="#ffb428" filter="url(#glow)"/>
+            <rect x="118" y="54" width="44" height="22" rx="4" fill="url(#cap)"/>
+            <circle cx="140" cy="168" r="104" fill="url(#steel)"/>
+            <ellipse cx="108" cy="128" rx="34" ry="18" fill="rgba(255,255,255,.16)"/>
+            <path d="M92 176c18 28 78 28 96 0" fill="none" stroke="rgba(0,0,0,.35)" stroke-width="6" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="turn-banner" id="youBanner" hidden>
+          <span>YOUR MOVE</span>
+        </div>
+      </div>
+
+      <div class="quest-dock">
+        <article class="quest-card" id="questCard" hidden>
+          <p class="quest-kicker" id="questKicker">Your challenge</p>
+          <h3 id="questQuestion">…</h3>
+          <div id="questVisual" class="quest-visual"></div>
+          <div id="questAnswers" class="answers"></div>
+        </article>
+        <article class="quest-card wait-card" id="waitCard">
+          <p class="quest-kicker">Live</p>
+          <p id="waitText" class="wait-copy">Waiting for the bomb…</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="screen-boom" class="screen boom-screen" data-screen="boom" hidden>
+      <p class="kicker">Eliminated</p>
+      <h2 class="boom-title">OUT</h2>
+      <p class="boom-sub" id="boomSub">Player eliminated</p>
+    </section>
+
+    <section id="screen-victory" class="screen victory-screen" data-screen="victory" hidden>
+      <div class="win-glow" aria-hidden="true"></div>
+      <p class="kicker">Winner</p>
+      <p class="win-rank">01</p>
+      <h2 id="winnerName">Alex</h2>
+      <p class="win-line" id="winLine">Last player standing</p>
+      <div class="stats" id="winStats"></div>
+      <button type="button" class="btn btn-accent btn-xl" id="rematchBtn">Play again</button>
+      <button type="button" class="btn btn-ghost" id="leaveWinBtn">Leave</button>
+    </section>
+  </main>
+
+  <section id="cover" class="cover" hidden>
+    <header class="cover-bar">Encyclopédie scolaire</header>
+    <article class="cover-page">
+      <p class="cover-kicker">Technologie — 4<sup>e</sup></p>
+      <h1>Cours de Technologie : Histoire des réseaux</h1>
+      <h2>1. Qu’est-ce qu’un réseau ?</h2>
+      <p>Un réseau informatique est un ensemble d’équipements reliés entre eux afin d’échanger des informations. On distingue les réseaux locaux (dans une salle, un établissement) et les réseaux étendus, qui relient des lieux distants.</p>
+      <h2>2. Du télégraphe à Internet</h2>
+      <p>Les premiers systèmes de communication à distance ont inspiré l’informatique. Au XX<sup>e</sup> siècle, des chercheurs ont conçu des protocoles pour faire circuler des paquets de données de manière fiable. Ces travaux ont donné naissance à Internet, un réseau de réseaux.</p>
+      <h2>3. Le modèle client-serveur</h2>
+      <p>Dans beaucoup d’applications, un serveur centralise des informations et répond aux demandes des clients. Cette organisation simplifie la mise à jour des données et permet à plusieurs utilisateurs de travailler en même temps.</p>
+      <h2>4. Vocabulaire</h2>
+      <ul>
+        <li><strong>Protocole</strong> : ensemble de règles pour communiquer.</li>
+        <li><strong>Adresse</strong> : identifiant d’une machine sur le réseau.</li>
+        <li><strong>Bande passante</strong> : quantité d’informations transmissible par seconde.</li>
+      </ul>
+      <p class="cover-foot">Document pédagogique — à recopier dans le cahier.</p>
+    </article>
+  </section>
+
+  <div id="toast" class="toast" hidden></div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
